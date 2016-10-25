@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Miroir</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/weather-icons.min.css" rel="stylesheet">
+    <link href="css/weather-icons-wind.min.css" rel="stylesheet">
+
+  </head>
+  <body style="background-color:black;">
+    
+    <div class="container" style="color:white; "> 
+      <div class="row">
+        <div class="col-md-12 text-center" style="font-size:5em;">
+          <span id="horloge"></span>
+        </div>
+      </div>
+      <div class="row" style="font-size:1.3em;">
+        <div class="col-md-4 pull-left" >
+          <i class="glyphicon glyphicon-list-alt"></i> Hey ! Restau ce soir ?<br/>
+          <i class="glyphicon glyphicon-gift"></i> A faire : Course <br/>
+          <i class="glyphicon glyphicon-fire"></i> Fractionné à préparer<br/>
+          <i class="glyphicon glyphicon-chevron-right"></i> Séance Yoga à 16h<br/>
+          <i class="glyphicon glyphicon-thumbs-up"></i> Préaprer diner parents<br/>
+        </div>
+       
+        <div class="col-md-3 pull-right" id="meteo" ></div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+        <ul id="test"></ul>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+      var aujourdhui = new Date();
+      var idCity = 3031582;
+      var apiID  = 'd41e584ee579483bf06548cf10b0b8ec';
+      var units ='metric';
+      var lang = 'fr';
+
+      $.ajax({
+        url : 'apimeteo', 
+        //url : 'http://api.openweathermap.org/data/2.5/forecast/city', 
+        type : 'GET',
+        //data : 'id='+idCity+'&APPID='+apiID+'&units='+units+'&lang='+lang,
+        dataType : 'JSON',
+        success : function(json, statut){ 
+            //alert(json['city']['name']);
+            var items = [];
+            items.push(aujourdhui+"<br/>");
+            $.each(json['list'], function( key, val ) {
+              var d = new Date(val["dt_txt"]);
+              var today = new Date();
+              if (d.getDay() == today.getDay()) {
+                items.push(d.getHours()+ 'h : ');
+                items.push( iconsTemps(val["weather"][0]["main"])+val["main"]["temp"]+'°C '+firstUpperCase(val["weather"][0]["description"])+'<br/>');
+              }
+              
+            });
+            $('#meteo').html(items); // renvoie le texte contenu à l'intérieur du paragraphe
+        },
+        error : function(resultat, statut, erreur){
+
+        }
+      });
+
+
+      function iconsTemps(temps) {
+        switch(temps) {
+            case 'Thunderstorm':
+                 return '<i class="wi wi-thunderstorm"></i>';
+                break;
+            case 'Drizzle':
+                return '<i class="wi wi-storm-showers"></i>';
+                break;
+            case 'Rain':
+                 return '<i class="wi wi-rain"></i>';
+                break;
+            case 'Snow':
+                return '<i class="wi wi-snow"></i>';
+                break;
+            case 'Atmosphere':
+                 return '<i class="wi wi-day-fog"></i>';
+                break;
+            case 'Clear':
+                return '<i class="wi wi-day-sunny"></i>';
+                break;
+            case 'Clouds':
+                return '<i class="wi wi-day-cloudy"></i>';
+                break;
+            case 'Extreme':
+                return '<i class="wi wi-hurricane"></i>';
+                break;
+        }
+      }
+      
+      
+    
+    horloge('horloge'); 
+    function horloge(el) {
+      if(typeof el=="string") { 
+        el = document.getElementById(el); 
+      
+      }
+      function actualiser() {
+        var date = new Date();
+        
+        if (date.getHours().length > 1 ) {
+          var str = date.getHours();
+        } else {
+          var str = '0'+date.getHours();
+        }
+        str += ':'+(date.getMinutes()<10?'0':'')+date.getMinutes();
+        el.innerHTML = str;
+      }
+      actualiser();
+      setInterval(actualiser,1000);
+    }
+    
+    function firstUpperCase(chaine){	return chaine.substr(0,1).toUpperCase()+	chaine.substr(1,chaine.length).toLowerCase()		}
+
+    function NomDuMois (QuelleDate)
+      {
+      switch (QuelleDate.getMonth())
+        {
+        case 0 : return ("janvier")
+                 break
+        case 1 : return ("février")
+                 break
+        case 2 : return ("mars")
+                 break
+        case 3 : return ("avril")
+                 break
+        case 4 : return ("mai")
+                 break
+        case 5 : return ("juin")
+                 break
+        case 6 : return ("juillet")
+                 break
+        case 7 : return ("août")
+                 break
+        case 8 : return ("septembre")
+                 break
+        case 9 : return ("octobre")
+                 break
+        case 10: return ("novembre")
+                 break
+        case 11: return ("décembre")
+                 break
+       } // Fin du switch
+      } // Fin de la fonction NomDuMois
+      
+      function NomDuJour (QuelleDate)
+      {
+      switch (QuelleDate.getDay())
+        {
+        case 1 : return "lundi"
+                 break
+        case 2 : return "mardi"
+                 break
+        case 3 : return "mercredi"
+                 break
+        case 4 : return "jeudi"
+                 break
+        case 5 : return "vendredi"
+                 break
+        case 6 : return "samedi"
+                 break
+        case 7 : return "dimanche"
+                 break
+        } // Fin du switch
+      } // Fin de la fonction NomDuJour
+    </script>
+  </body>
+</html>
+
+<!--http://api.openweathermap.org/data/2.5/forecast/city?id=3031582&APPID=d41e584ee579483bf06548cf10b0b8ec&units=metric&lang=fr
+
+http://openweathermap.org/weather-data
+-->
