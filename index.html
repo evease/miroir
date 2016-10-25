@@ -20,11 +20,16 @@
       </div>
       <div class="row" style="font-size:1.3em;">
         <div class="col-md-4 pull-left" >
-          <i class="glyphicon glyphicon-list-alt"></i> Hey ! Restau ce soir ?<br/>
-          <i class="glyphicon glyphicon-gift"></i> A faire : Course <br/>
-          <i class="glyphicon glyphicon-fire"></i> Fractionné à préparer<br/>
-          <i class="glyphicon glyphicon-chevron-right"></i> Séance Yoga à 16h<br/>
-          <i class="glyphicon glyphicon-thumbs-up"></i> Préaprer diner parents<br/>
+          <div class="row">
+            <i class="glyphicon glyphicon-list-alt"></i> Hey ! Restau ce soir ?<br/>
+            <i class="glyphicon glyphicon-gift"></i> A faire : Course <br/>
+            <i class="glyphicon glyphicon-fire"></i> Fractionné à préparer<br/>
+            <i class="glyphicon glyphicon-chevron-right"></i> Séance Yoga à 16h<br/>
+            <i class="glyphicon glyphicon-thumbs-up"></i> Préaprer diner parents<br/>
+          </div>
+          <div class="row" id="steam">
+            
+          </div>
         </div>
        
         <div class="col-md-3 pull-right" id="meteo" ></div>
@@ -35,47 +40,55 @@
         </div>
       </div>
     </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/dateUtils.js"></script>
     <script src="js/printUtils.js"></script>
     <script src="js/stringUtils.js"></script>
+    <script src="js/steam.js"></script>
     <script>
-      var aujourdhui = new Date();
-      var idCity = 3031582;
-      var apiID  = 'd41e584ee579483bf06548cf10b0b8ec';
-      var units ='metric';
-      var lang = 'fr';
-
-      $.ajax({
-        url : 'apimeteo', 
-        //url : 'http://api.openweathermap.org/data/2.5/forecast/city', 
-        type : 'GET',
-        //data : 'id='+idCity+'&APPID='+apiID+'&units='+units+'&lang='+lang,
-        dataType : 'JSON',
-        success : function(json, statut){ 
-            //alert(json['city']['name']);
-            var items = [];
-            items.push("<u>"+firstUpperCase(nomDuJour(aujourdhui))+" "+aujourdhui.getDate()+" "+nomDuMois(aujourdhui)+" "+aujourdhui.getFullYear()+"</u><br/>");
-            $.each(json['list'], function( key, val ) {
-              var d = new Date(val["dt_txt"]);
-              var today = new Date();
-              if (d.getDay() == today.getDay()) {
-                items.push(d.getHours()+ 'h : ');
-                items.push( iconsTemps(val["weather"][0]["main"])+val["main"]["temp"]+'°C '+firstUpperCase(val["weather"][0]["description"])+'<br/>');
-              }
-              
-            });
-            $('#meteo').html(items); // renvoie le texte contenu à l'intérieur du paragraphe
-        },
-        error : function(resultat, statut, erreur){
-
-        }
-      });
-
-
+      listeAmisSTEAM();
     
-    horloge('horloge'); 
+    
+      function refresh() {
+        var aujourdhui = new Date();
+        var idCity = 3031582;
+        var apiID  = 'd41e584ee579483bf06548cf10b0b8ec';
+        var units ='metric';
+        var lang = 'fr';
+  
+        $.ajax({
+          url : 'model/apimeteo', 
+          //url : 'http://api.openweathermap.org/data/2.5/forecast/city', 
+          type : 'GET',
+          //data : 'id='+idCity+'&APPID='+apiID+'&units='+units+'&lang='+lang,
+          dataType : 'JSON',
+          success : function(json, statut){ 
+              //alert(json['city']['name']);
+              var items = [];
+              items.push("<u>"+firstUpperCase(nomDuJour(aujourdhui))+" "+aujourdhui.getDate()+" "+nomDuMois(aujourdhui)+" "+aujourdhui.getFullYear()+"</u><br/>");
+              $.each(json['list'], function( key, val ) {
+                var d = new Date(val["dt_txt"]);
+                var today = new Date();
+                if (d.getDay() == today.getDay()) {
+                  items.push(d.getHours()+ 'h : ');
+                  items.push( iconsTemps(val["weather"][0]["main"])+val["main"]["temp"]+'°C '+firstUpperCase(val["weather"][0]["description"])+'<br/>');
+                }
+                
+              });
+              $('#meteo').html(items); // renvoie le texte contenu à l'intérieur du paragraphe
+          },
+          error : function(resultat, statut, erreur){
+  
+          }
+        });
+        
+      }
+      
+      setInterval(refresh(), 10000); // Répète la fonction toutes les 10 sec
+
+      horloge('horloge'); 
     </script>
   </body>
 </html>
