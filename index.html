@@ -21,18 +21,21 @@
       <div class="row" style="font-size:1.3em;">
         <div class="col-md-4 pull-left" >
           <div class="row">
-            <i class="glyphicon glyphicon-list-alt"></i> Hey ! Restau ce soir ?<br/>
-            <i class="glyphicon glyphicon-gift"></i> A faire : Course <br/>
-            <i class="glyphicon glyphicon-fire"></i> Fractionné à préparer<br/>
-            <i class="glyphicon glyphicon-chevron-right"></i> Séance Yoga à 16h<br/>
-            <i class="glyphicon glyphicon-thumbs-up"></i> Préaprer diner parents<br/>
+            <div class="col-md-12">
+              <i class="glyphicon glyphicon-list-alt"></i> Hey ! Restau ce soir ?<br/>
+              <i class="glyphicon glyphicon-gift"></i> A faire : Course <br/>
+              <i class="glyphicon glyphicon-fire"></i> Fractionné à préparer<br/>
+              <i class="glyphicon glyphicon-chevron-right"></i> Séance Yoga à 16h<br/>
+              <i class="glyphicon glyphicon-thumbs-up"></i> Préaprer diner parents<br/>
+            </div>
           </div>
-          <div class="row" id="steam">
-            
+          <hr/>
+          <div class="row">
+            <div class="col-md-12" id="steam" ></div>
           </div>
         </div>
        
-        <div class="col-md-3 pull-right" id="meteo" ></div>
+        <div class="col-md-4 pull-right" id="meteo" ></div>
       </div>
       <div class="row">
         <div class="col-md-12">
@@ -48,24 +51,18 @@
     <script src="js/stringUtils.js"></script>
     <script src="js/steam.js"></script>
     <script>
-      listeAmisSTEAM();
+      var affichageSTEAM = listeAmisSTEAM();
+      $('#steam').html();
     
     
       function refresh() {
         var aujourdhui = new Date();
-        var idCity = 3031582;
-        var apiID  = 'd41e584ee579483bf06548cf10b0b8ec';
-        var units ='metric';
-        var lang = 'fr';
   
         $.ajax({
-          url : 'model/apimeteo', 
-          //url : 'http://api.openweathermap.org/data/2.5/forecast/city', 
+          url : 'model/meteo.php', 
           type : 'GET',
-          //data : 'id='+idCity+'&APPID='+apiID+'&units='+units+'&lang='+lang,
           dataType : 'JSON',
           success : function(json, statut){ 
-              //alert(json['city']['name']);
               var items = [];
               items.push("<u>"+firstUpperCase(nomDuJour(aujourdhui))+" "+aujourdhui.getDate()+" "+nomDuMois(aujourdhui)+" "+aujourdhui.getFullYear()+"</u><br/>");
               $.each(json['list'], function( key, val ) {
@@ -80,7 +77,7 @@
               $('#meteo').html(items); // renvoie le texte contenu à l'intérieur du paragraphe
           },
           error : function(resultat, statut, erreur){
-  
+            alert(erreur)
           }
         });
         
@@ -93,7 +90,8 @@
   </body>
 </html>
 
-<!--http://api.openweathermap.org/data/2.5/forecast/city?id=3031582&APPID=d41e584ee579483bf06548cf10b0b8ec&units=metric&lang=fr
-
+<!--
+http://api.openweathermap.org/data/2.5/forecast/city?id=3031582&APPID=d41e584ee579483bf06548cf10b0b8ec&units=metric&lang=fr
+https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=72110FFBA0370ABB8A511A2EB8107077&steamids=76561197992355255
 http://openweathermap.org/weather-data
 -->

@@ -7,23 +7,27 @@ function listeAmisSTEAM(){
         type : 'GET',
         dataType : 'JSON',
         success : function(json, statut){ 
-            detailAmiSTEAM('76561197992355255');
+            var printHTML = [];
+             $.each(json['friendslist']['friends'], function( key, val ) {
+               printHTML.push(detailAmiSTEAM(val['steamid']));
+               printHTML.push("<br/>");
+             });
         },
         error : function(resultat, statut, erreur){}
     });
 }
 
 function detailAmiSTEAM(steamId){
-    alert(steamId)
     $.ajax({
       url : 'model/detailAmiSTEAM.php?steamId='+steamId,
       type : 'GET',
       dataType : 'JSON',
       success : function(json, statut){ 
-        alert(json)
+        if (json['response']['players'][0]['personastate'] == 1) {
+            $('#steam').append("<img src='"+json['response']['players'][0]['avatar']+"'/> " + json['response']['players'][0]['personaname']+"<br/>");
+        } 
       },
-      error : function(resultat, statut, erreur){
-      }
+      error : function(resultat, statut, erreur){}
     });
 }
 
