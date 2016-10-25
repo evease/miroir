@@ -37,6 +37,9 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/dateUtils.js"></script>
+    <script src="js/printUtils.js"></script>
+    <script src="js/stringUtils.js"></script>
     <script>
       var aujourdhui = new Date();
       var idCity = 3031582;
@@ -53,7 +56,7 @@
         success : function(json, statut){ 
             //alert(json['city']['name']);
             var items = [];
-            items.push(aujourdhui+"<br/>");
+            items.push("<u>"+firstUpperCase(nomDuJour(aujourdhui))+" "+aujourdhui.getDate()+" "+nomDuMois(aujourdhui)+" "+aujourdhui.getFullYear()+"</u><br/>");
             $.each(json['list'], function( key, val ) {
               var d = new Date(val["dt_txt"]);
               var today = new Date();
@@ -71,111 +74,8 @@
       });
 
 
-      function iconsTemps(temps) {
-        switch(temps) {
-            case 'Thunderstorm':
-                 return '<i class="wi wi-thunderstorm"></i>';
-                break;
-            case 'Drizzle':
-                return '<i class="wi wi-storm-showers"></i>';
-                break;
-            case 'Rain':
-                 return '<i class="wi wi-rain"></i>';
-                break;
-            case 'Snow':
-                return '<i class="wi wi-snow"></i>';
-                break;
-            case 'Atmosphere':
-                 return '<i class="wi wi-day-fog"></i>';
-                break;
-            case 'Clear':
-                return '<i class="wi wi-day-sunny"></i>';
-                break;
-            case 'Clouds':
-                return '<i class="wi wi-day-cloudy"></i>';
-                break;
-            case 'Extreme':
-                return '<i class="wi wi-hurricane"></i>';
-                break;
-        }
-      }
-      
-      
     
     horloge('horloge'); 
-    function horloge(el) {
-      if(typeof el=="string") { 
-        el = document.getElementById(el); 
-      
-      }
-      function actualiser() {
-        var date = new Date();
-        
-        if (date.getHours().length > 1 ) {
-          var str = date.getHours();
-        } else {
-          var str = '0'+date.getHours();
-        }
-        str += ':'+(date.getMinutes()<10?'0':'')+date.getMinutes();
-        el.innerHTML = str;
-      }
-      actualiser();
-      setInterval(actualiser,1000);
-    }
-    
-    function firstUpperCase(chaine){	return chaine.substr(0,1).toUpperCase()+	chaine.substr(1,chaine.length).toLowerCase()		}
-
-    function NomDuMois (QuelleDate)
-      {
-      switch (QuelleDate.getMonth())
-        {
-        case 0 : return ("janvier")
-                 break
-        case 1 : return ("février")
-                 break
-        case 2 : return ("mars")
-                 break
-        case 3 : return ("avril")
-                 break
-        case 4 : return ("mai")
-                 break
-        case 5 : return ("juin")
-                 break
-        case 6 : return ("juillet")
-                 break
-        case 7 : return ("août")
-                 break
-        case 8 : return ("septembre")
-                 break
-        case 9 : return ("octobre")
-                 break
-        case 10: return ("novembre")
-                 break
-        case 11: return ("décembre")
-                 break
-       } // Fin du switch
-      } // Fin de la fonction NomDuMois
-      
-      function NomDuJour (QuelleDate)
-      {
-      switch (QuelleDate.getDay())
-        {
-        case 1 : return "lundi"
-                 break
-        case 2 : return "mardi"
-                 break
-        case 3 : return "mercredi"
-                 break
-        case 4 : return "jeudi"
-                 break
-        case 5 : return "vendredi"
-                 break
-        case 6 : return "samedi"
-                 break
-        case 7 : return "dimanche"
-                 break
-        } // Fin du switch
-      } // Fin de la fonction NomDuJour
     </script>
   </body>
 </html>
