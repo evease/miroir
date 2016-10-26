@@ -21,12 +21,7 @@
       <div class="row" style="font-size:1.3em;">
         <div class="col-md-4 pull-left" >
           <div class="row">
-            <div class="col-md-12">
-              <i class="glyphicon glyphicon-list-alt"></i> Hey ! Restau ce soir ?<br/>
-              <i class="glyphicon glyphicon-gift"></i> A faire : Course <br/>
-              <i class="glyphicon glyphicon-fire"></i> Fractionné à préparer<br/>
-              <i class="glyphicon glyphicon-chevron-right"></i> Séance Yoga à 16h<br/>
-              <i class="glyphicon glyphicon-thumbs-up"></i> Préaprer diner parents<br/>
+            <div class="col-md-12" id="todoliste">
             </div>
           </div>
           <hr/>
@@ -51,41 +46,80 @@
     <script src="js/stringUtils.js"></script>
     <script src="js/steam.js"></script>
     <script>
-      var affichageSTEAM = listeAmisSTEAM();
-      $('#steam').html();
-    
-    
+      horloge('horloge');
+      refresh();
       function refresh() {
-        var aujourdhui = new Date();
-  
+        getMeteo();
+        getListe();
+        
+         $('#steam').empty();
+        listeAmisSTEAM();
+      }
+      setInterval(refresh, 100000); // Répète la fonction toutes les 10 sec
+      
+      function getListe() {
         $.ajax({
-          url : 'model/meteo.php', 
-          type : 'GET',
-          dataType : 'JSON',
-          success : function(json, statut){ 
-              var items = [];
-              items.push("<u>"+firstUpperCase(nomDuJour(aujourdhui))+" "+aujourdhui.getDate()+" "+nomDuMois(aujourdhui)+" "+aujourdhui.getFullYear()+"</u><br/>");
-              $.each(json['list'], function( key, val ) {
-                var d = new Date(val["dt_txt"]);
-                var today = new Date();
-                if (d.getDay() == today.getDay()) {
-                  items.push(d.getHours()+ 'h : ');
-                  items.push( iconsTemps(val["weather"][0]["main"])+val["main"]["temp"]+'°C '+firstUpperCase(val["weather"][0]["description"])+'<br/>');
-                }
-                
-              });
-              $('#meteo').html(items); // renvoie le texte contenu à l'intérieur du paragraphe
+          url: 'https://mirror-evease.c9users.io/client/todoList/model/liste.json',
+          type: 'GET',
+          dataType: 'json',
+          success: function(json, statut) {
+            var todoliste = [];
+            $.each(json['elements'], function(key, val) {
+              todoliste.push("<i class='glyphicon " + val['icon'] + "'></i> " + val['text'] + "<br/>");
+            });
+            $("#todoliste").html(todoliste);
           },
-          error : function(resultat, statut, erreur){
+          error: function(resultat, statut, erreur) {
             alert(erreur)
           }
         });
-        
       }
       
-      setInterval(refresh(), 10000); // Répète la fonction toutes les 10 sec
+      function getMeteo() {
+        var aujourdhui = new Date();
+        var dateAffiche = false;
+        $.ajax({
+          url: 'model/meteo.php',
+          type: 'GET',
+          dataType: 'JSON',
+          success: function(json, statut) {
+            var items = [];
+            items.push("<u>" + firstUpperCase(nomDuJour(aujourdhui)) + " " + aujourdhui.getDate() + " " + nomDuMois(aujourdhui) + " " + aujourdhui.getFullYear() + "</u><br/>");
+            $.each(json['list'], function(key, val) {
+              var d = new Date(val["dt_txt"]);
+              var today = new Date();
+              // Après 16h on affiche le jour d'après
+              if (today.getHours() > 16) {
+                if (d.getDate() == today.getDate()) {
+                  items.push(d.getHours() + 'h : ');
+                  items.push(iconsTemps(val["weather"][0]["main"]) + val["main"]["temp"] + '°C ' + firstUpperCase(val["weather"][0]["description"]) + '<br/>');
+                }
+                if (d.getDate() === today.getDate() + 1) {
+                  // Si c'est la premiere fois qu'on affiche la temperature du lendemain, on mets la date
+                  if (dateAffiche == false) {
+                    items.push("<u>" + firstUpperCase(nomDuJour(aujourdhui)) + " " + aujourdhui.getDate() + " " + nomDuMois(aujourdhui) + " " + aujourdhui.getFullYear() + "</u><br/>");
+                    dateAffiche = true
+                  }
+                  items.push(d.getHours() + 'h : ');
+                  items.push(iconsTemps(val["weather"][0]["main"]) + val["main"]["temp"] + '°C ' + firstUpperCase(val["weather"][0]["description"]) + '<br/>');
+                }
+              }
+              else {
+                if (d.getDate() == today.getDate()) {
+                  items.push(d.getHours() + 'h : ');
+                  items.push(iconsTemps(val["weather"][0]["main"]) + val["main"]["temp"] + '°C ' + firstUpperCase(val["weather"][0]["description"]) + '<br/>');
+                }
+              }
 
-      horloge('horloge'); 
+
+            });
+            $('#meteo').html(items); // renvoie le texte contenu à l'intérieur du paragraphe
+          },
+          error: function(resultat, statut, erreur) {
+            alert(erreur)
+          }
+        });
+      }
     </script>
   </body>
 </html>
