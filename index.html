@@ -1,57 +1,55 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mirroir</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/weather-icons.min.css" rel="stylesheet">
-    <link href="css/weather-icons-wind.min.css" rel="stylesheet">
 
-  </head>
-  <body style="background-color:black;">
-    
-    <div class="container" style="color:white; "> 
-      <div class="row">
-        <div class="col-md-12 text-center" style="font-size:5em;">
-          <span id="horloge"></span>
-        </div>
-      </div>
-      <div class="row" style="font-size:1.3em;">
-        <div class="col-md-4 pull-left" >
-          <div class="row">
-            <div class="col-md-12" id="todoliste">
-            </div>
-          </div>
-          <hr/>
-          <div class="row">
-            <div class="col-md-12" id="steam" ></div>
-          </div>
-        </div>
-       
-        <div class="col-md-4 pull-right" id="meteo" ></div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-        <ul id="test"></ul>
-        </div>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mirroir</title>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/weather-icons.min.css" rel="stylesheet">
+  <link href="css/weather-icons-wind.min.css" rel="stylesheet">
+
+</head>
+
+<body style="background-color:black;color:white; margin-left:10px;margin-right:10px;">
+
+    <div class="row">
+      <div class="col-md-12 text-center" style="font-size:5em;">
+        <span id="horloge"></span>
       </div>
     </div>
+    <div class="row" style="font-size:1.3em;">
+      <div class="col-md-3 pull-left">
+        <div class="row">
+          <div class="col-md-12" id="todoliste">
+          </div>
+        </div>
+        <hr/>
+        <div class="row">
+          <div class="col-md-12" id="steam"></div>
+        </div>
+      </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/dateUtils.js"></script>
-    <script src="js/printUtils.js"></script>
-    <script src="js/stringUtils.js"></script>
-    <script src="js/steam.js"></script>
+      <div class="col-md-3 pull-right" id="meteo"></div>
+    </div>
+    <div class="row" id="infos" style="position: absolute; bottom: 0; left: 0; right: 0;margin:5px;"></div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/dateUtils.js"></script>
+  <script src="js/printUtils.js"></script>
+  <script src="js/stringUtils.js"></script>
+  <script src="js/steam.js"></script>
     <script>
       horloge('horloge');
       refresh();
+      
+      getInfos();
+      
       function refresh() {
         getMeteo();
         getListe();
-        
          $('#steam').empty();
         listeAmisSTEAM();
       }
@@ -71,6 +69,31 @@
           },
           error: function(resultat, statut, erreur) {
             alert(erreur)
+          }
+        });
+      }
+      
+      function getInfos() {
+        $.ajax({
+          url: 'model/infos.php',
+          type: 'GET',
+          dataType: 'xml',
+          success: function(xml, statut) {
+            var printHTML = [];
+            var i = 1;
+              $(xml).find('item').each( function(){ 
+                if (i < 5) {
+                  var titre = $(this).find('title').text();
+                  var description = $(this).find('description').text();
+                  var img = $(this).find('enclosure').attr('url');
+                  printHTML.push('<div class="col-md-6"><div class="media" style="margin-top:5px;"><div class="media-left"><img alt="64x64" class="media-object" data-src="holder.js/64x64" src="'+img+'" data-holder-rendered="true" style="width: 64px; height: 64px;"> </div><div class="media-body"> <h4 class="media-heading">'+titre+'</h4>'+description+'</div></div> </div>');
+                  i = i + 1;
+                }
+              });
+            $("#infos").html(printHTML);
+          },
+          error: function(resultat, statut, erreur) {
+            alert(erreur);
           }
         });
       }
