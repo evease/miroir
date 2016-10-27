@@ -9,31 +9,35 @@
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/weather-icons.min.css" rel="stylesheet">
   <link href="css/weather-icons-wind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
 
 </head>
 
-<body style="background-color:black;color:white; margin-left:10px;margin-right:10px;">
+<body style="background-color:black;color:white; margin-left:10px;margin-right:10px;font-family: 'Indie Flower', cursive;">
 
     <div class="row">
-      <div class="col-md-12 text-center" style="font-size:5em;">
+      <div class="col-md-12 text-center" style="font-size:7em;">
         <span id="horloge"></span>
       </div>
     </div>
-    <div class="row" style="font-size:1.3em;">
+    <div class="row" style="font-size:1.4em;">
       <div class="col-md-3 pull-left">
         <div class="row">
           <div class="col-md-12" id="todoliste">
           </div>
         </div>
-        <hr/>
+        <div class="row">
+          <div class="col-md-5">
+            <hr/>
+          </div>
+        </div>
         <div class="row">
           <div class="col-md-12" id="steam"></div>
         </div>
       </div>
-
       <div class="col-md-3 pull-right" id="meteo"></div>
-    </div>
-    <div class="row" id="infos" style="position: absolute; bottom: 0; left: 0; right: 0;margin:5px;"></div>
+      <div class="row" id="citations"></div>
+      <div class="row" id="infos" style="position: absolute; bottom: 0; left: 0; right: 0;margin:5px;font-size:0.7em;"></div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
@@ -50,8 +54,10 @@
       function refresh() {
         getMeteo();
         getListe();
-         $('#steam').empty();
+        $('#steam').empty();
         listeAmisSTEAM();
+        getCitations();
+        getInfos();
       }
       setInterval(refresh, 100000); // Répète la fonction toutes les 10 sec
       
@@ -98,6 +104,29 @@
         });
       }
       
+      function getCitations() {
+        $.ajax({
+          url: 'model/citations.php',
+          type: 'GET',
+          dataType: 'xml',
+          success: function(xml, statut) {
+            var printHTML = [];
+            var i = 1;
+              $(xml).find('item').each( function(){ 
+                if (i < 5) {
+                  var description = $(this).find('description').text();
+                  printHTML.push('<span>'+ $(this).find('description').text()+'</span>');
+                  i = i + 1;
+                }
+              });
+            $("#citations").html(printHTML);
+          },
+          error: function(resultat, statut, erreur) {
+            alert(erreur);
+          }
+        });
+      }
+      
       function getMeteo() {
         var aujourdhui = new Date();
         var dateAffiche = false;
@@ -112,10 +141,10 @@
               var d = new Date(val["dt_txt"]);
               var today = new Date();
               // Après 16h on affiche le jour d'après
-              if (today.getHours() > 16) {
+              if (today.getHours() >= 16) {
                 if (d.getDate() == today.getDate()) {
                   items.push(d.getHours() + 'h : ');
-                  items.push(iconsTemps(val["weather"][0]["main"]) + val["main"]["temp"] + '°C ' + firstUpperCase(val["weather"][0]["description"]) + '<br/>');
+                  items.push(iconsTemps(val["weather"][0]["main"]) +" "+ Math.round(val["main"]["temp"]) + '°C ' + firstUpperCase(val["weather"][0]["description"]) + '<br/>');
                 }
                 if (d.getDate() === today.getDate() + 1) {
                   // Si c'est la premiere fois qu'on affiche la temperature du lendemain, on mets la date
@@ -124,13 +153,13 @@
                     dateAffiche = true
                   }
                   items.push(d.getHours() + 'h : ');
-                  items.push(iconsTemps(val["weather"][0]["main"]) + val["main"]["temp"] + '°C ' + firstUpperCase(val["weather"][0]["description"]) + '<br/>');
+                  items.push(iconsTemps(val["weather"][0]["main"]) +" "+  Math.round(val["main"]["temp"]) + '°C ' + firstUpperCase(val["weather"][0]["description"]) + '<br/>');
                 }
               }
               else {
                 if (d.getDate() == today.getDate()) {
                   items.push(d.getHours() + 'h : ');
-                  items.push(iconsTemps(val["weather"][0]["main"]) + val["main"]["temp"] + '°C ' + firstUpperCase(val["weather"][0]["description"]) + '<br/>');
+                  items.push(iconsTemps(val["weather"][0]["main"]) +" "+  Math.round(val["main"]["temp"]) + '°C ' + firstUpperCase(val["weather"][0]["description"]) + '<br/>');
                 }
               }
 
